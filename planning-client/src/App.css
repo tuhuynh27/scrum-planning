@@ -14,3 +14,28 @@
         bottom: 0;
     }
 }
+
+
+.voting-card {
+    width: 50px;
+    height: 70px;
+    border-radius: 5px;
+    background-color: #ECECEE;
+    position: absolute;
+    top: 20px;
+    right: 20px;
+}
+
+.voting-card.voted {
+    background-color: #419EFE;
+}
+
+.voting-card.revealed {
+    background-color: white;
+    border: 2px solid #419EFE;
+    color: #419EFE;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 18px;
+}

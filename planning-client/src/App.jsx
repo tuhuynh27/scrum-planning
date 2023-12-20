@@ -214,14 +214,17 @@ function App() {
   return (
     <>
       <div className="container mt-5">
-        <h2>Scrum Planning Meeting</h2>
+        <h2>RWSG Scrum Planning Poker</h2>
+        <div className="text-right">
+          Logged in as <strong>{connected}</strong> <button className="btn btn-sm btn-dark" onClick={handleLogout}>Logout</button>
+        </div>
         <div className="row mt-4">
-          <div className="col-md-6">
+          <div className="col-md-12">
             {connected === 'master' && (
               <React.Fragment>
                 <div className="form-group">
                   <label htmlFor="ticketNumber">Current Ticket:</label>
-                  <input type="text" onChange={handleTicketChange} value={currentTicket} className="form-control" id="ticketNumber" placeholder="Enter ticket number"/>
+                  <input type="text" onChange={handleTicketChange} value={currentTicket} className="form-control" style={{ maxWidth: '500px' }} id="ticketNumber" placeholder="Enter ticket number"/>
                 </div>
               </React.Fragment>
             )}
@@ -232,23 +235,32 @@ function App() {
                 </div>
               </React.Fragment>
             )}
-            <div className="form-group">
-              <label htmlFor="joiningPlayers">Joining Developers:</label>
-              <ul id="joiningPlayers" className="list-group">
-                {Object.keys(state.users).map(username => (
-                  <li key={username} className="list-group-item"><strong>{username}</strong>: {gameState === 'voting' ? state.users[username] > 0 ? 'Voted' : 'Not yet voted' : state.users[username] > 0 ? state.users[username] : 'Not yet voted'}</li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              Logged in as {connected} <button className="btn btn-dark" onClick={handleLogout}>Logout</button>
+            <div id="joiningPlayers" className="card-group">
+              {Object.keys(state.users).map(username => (
+                <UserCard
+                  key={username}
+                  username={username}
+                  voteStatus={state.users[username]}
+                  gameState={gameState}
+                />
+              ))}
             </div>
           </div>
-          <div className="col-md-6">
+          <div className="col-md-12 text-center">
+            {connected === 'master' && gameState === 'voting' && (
+              <div className="form-group">
+                <button type="button" onClick={handleEnd} className="btn btn-primary">Show cards</button>
+              </div>
+            )}
+            {connected === 'master' && gameState !== 'voting' && (
+              <div className="form-group">
+                <button type="button" onClick={handleStart} className="btn btn-secondary">Vote next issue</button>
+              </div>
+            )}
             {gameState === 'voting' && (
               <div className="form-group">
                 <h2>Voting...</h2>
-                <label htmlFor="estimation">Select Story Points (1-5):</label>
+                <label htmlFor="estimation">Choose your card:</label>
                 <div className="estimation-buttons">
                   {[...Array(5)].map((_, index) => (
                     <button key={index} type="button"
@@ -260,30 +272,32 @@ function App() {
             )}
             {gameState !== 'voting' && (
               <div className="form-group">
-                <h2>Estimate: <strong>{avg}</strong></h2>
-              </div>
-            )}
-            {connected === 'master' && gameState === 'voting' && (
-              <div className="form-group">
-                <button type="button" onClick={handleEnd} className="btn btn-danger">End voting</button>
-              </div>
-            )}
-            {connected === 'master' && gameState !== 'voting' && (
-              <div className="form-group">
-                <button type="button" onClick={handleStart} className="btn btn-primary">Start new round</button>
+                <h2>Average: <strong>{avg}</strong></h2>
               </div>
             )}
           </div>
         </div>
       </div>
-      <footer className="text-center text-lg-start">
-        <div className="text-center p-3">
-          © 2023 RWSG, <a href="https://github.com/tuhuynh27/scrum-planning" target="_blank" rel="noreferrer">Github</a>
-        </div>
-        {/* Copyright */}
-      </footer>
     </>
   )
 }
+
+const UserCard = ({ username, voteStatus, gameState }) => {
+  return (
+    <div className="col-md-3 mb-3">
+      <div className="card">
+        <div className="card-body">
+          <h5 className="card-title"><strong>{username}</strong></h5>
+          <p className="card-text">
+            {voteStatus > 0 ? 'Done!' : 'Hmm...'}
+          </p>
+          <div className={`voting-card ${gameState === 'voting' && voteStatus > 0 ? 'voted' : null} ${gameState !== 'voting' && voteStatus > 0 ? 'revealed' : null}`}>
+            { gameState !== 'voting' && voteStatus > 0 && voteStatus }
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export default App
