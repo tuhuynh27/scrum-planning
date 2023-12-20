@@ -287,7 +287,7 @@ const UserCard = ({ username, voteStatus, gameState }) => {
     <div className="col-md-3 mb-3">
       <div className="card">
         <div className="card-body">
-          <h5 className="card-title"><strong>{username}</strong></h5>
+          <h5 className="card-title"><strong>{username.toLowerCase()}</strong></h5>
           <p className="card-text">
             {voteStatus > 0 ? 'Done!' : 'Hmm...'}
           </p>
