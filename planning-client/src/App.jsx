@@ -159,18 +159,23 @@ function App() {
     })
  }
 
- const handleTicketChange = (event) => {
+ const sendTicketToServer = (data) => {
    const username = localStorage.getItem('username')
-   setCurrentTicket(event.target.value)
    fetch('https://plan-api.rwsg.lol/ticket', {
      method: 'POST',
      headers: {
        'Content-Type': 'application/json',
      },
-     body: JSON.stringify({username, ticket: event.target.value}),
+     body: JSON.stringify({username, ticket: data}),
    }).then(r => r.json()).then(data => {
      console.log(data)
    })
+ }
+
+ const handleTicketChange = (event) => {
+   const username = localStorage.getItem('username')
+   setCurrentTicket(event.target.value)
+   sendTicketToServer(event.target.value)
   }
 
   const handleEnd = () => {
@@ -196,7 +201,14 @@ function App() {
       body: JSON.stringify({username}),
     }).then(r => r.json()).then(data => {
       console.log(data)
+      setCurrentTicket('')
+      sendTicketToServer('')
     })
+  }
+
+  const handleLogout = () => {
+    localStorage.removeItem('username')
+    window.location.reload()
   }
 
   return (
@@ -216,8 +228,7 @@ function App() {
             {connected !== 'master' && (
               <React.Fragment>
                 <div className="form-group">
-                  <p>Current Ticket:</p>
-                  <div>{currentTicket || 'Waiting for input from Scrum master'}</div>
+                  <p>Current Ticket: <strong>{currentTicket || 'Waiting for input from Scrum master'}</strong></p>
                 </div>
               </React.Fragment>
             )}
@@ -225,9 +236,12 @@ function App() {
               <label htmlFor="joiningPlayers">Joining Developers:</label>
               <ul id="joiningPlayers" className="list-group">
                 {Object.keys(state.users).map(username => (
-                  <li key={username} className="list-group-item">{username}: {gameState === 'voting' ? state.users[username] > 0 ? 'Voted' : 'Not yet voted' : state.users[username] > 0 ? state.users[username] : 'Not yet voted'}</li>
+                  <li key={username} className="list-group-item"><strong>{username}</strong>: {gameState === 'voting' ? state.users[username] > 0 ? 'Voted' : 'Not yet voted' : state.users[username] > 0 ? state.users[username] : 'Not yet voted'}</li>
                 ))}
               </ul>
+            </div>
+            <div>
+              Logged in as {connected} <button className="btn btn-dark" onClick={handleLogout}>Logout</button>
             </div>
           </div>
           <div className="col-md-6">
@@ -262,6 +276,12 @@ function App() {
           </div>
         </div>
       </div>
+      <footer className="text-center text-lg-start">
+        <div className="text-center p-3">
+          © 2023 RWSG, <a href="https://github.com/tuhuynh27/scrum-planning" target="_blank" rel="noreferrer">Github</a>
+        </div>
+        {/* Copyright */}
+      </footer>
     </>
   )
 }
