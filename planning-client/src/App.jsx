@@ -94,6 +94,7 @@ function App() {
       if (username) {
         localStorage.setItem('username', username)
       }
+      window.location.reload()
     } else {
       const socket = io('https://plan-api.rwsg.lol', {
         query: { username: username },
