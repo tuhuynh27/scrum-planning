@@ -264,7 +264,7 @@ function App() {
                   {[...Array(5)].map((_, index) => (
                     <button key={index} type="button"
                             onClick={() => submitVote(index + 1)}
-                            className={`btn ${currentVote === index + 1 ? 'btn-primary' : 'btn-secondary'} mr-2`}>{index + 1}</button>
+                            className={`btn btn-lg ${currentVote === index + 1 ? 'btn-primary' : 'btn-secondary'} mr-2`}>{index + 1}</button>
                   ))}
                 </div>
               </div>
