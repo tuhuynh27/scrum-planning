@@ -109,10 +109,6 @@ app.post('/end', express.json(), (req, res) => {
 io.use((socket, next) => {
   const username = socket.handshake.query.username;
   if (username) {
-    if (users[username]) {
-      next(new Error('Authentication error: Username already existed'));
-      return;
-    }
     socket.username = username;
     users[username] = 0;
     io.emit('userJoined', username);
@@ -127,7 +123,7 @@ io.use((socket, next) => {
 io.on('connection', (socket) => {
   // Handle disconnection of clients
   socket.on('disconnect', () => {
-    if (socket.username && users[socket.username] !== null) {
+    if (socket.username && users[socket.username] !== undefined) {
       delete users[socket.username];
       io.emit('userDisconnected', socket.username);
       console.log('A user disconnected: ', socket.username);

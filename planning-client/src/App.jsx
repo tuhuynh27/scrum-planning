@@ -173,7 +173,6 @@ function App() {
  }
 
  const handleTicketChange = (event) => {
-   const username = localStorage.getItem('username')
    setCurrentTicket(event.target.value)
    sendTicketToServer(event.target.value)
   }
@@ -272,7 +271,7 @@ function App() {
             )}
             {gameState !== 'voting' && (
               <div className="form-group">
-                <h2>Average: <strong>{avg}</strong></h2>
+                <h2>Average: <strong>{isNaN(avg) ? '0' : avg}</strong></h2>
               </div>
             )}
           </div>
