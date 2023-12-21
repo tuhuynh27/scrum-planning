@@ -97,21 +97,21 @@ function App() {
       window.location.reload()
     } else {
       const socket = io('https://plan-api.rwsg.lol', {
-        query: { username: username },
+        query: { username },
       })
 
       socket.on('connect', () => {
-        showMessage(`Connected to server as ${username}`)
+        showMessage(`Logged in as ${username}`)
         setConnected(username)
       })
 
       socket.on('userJoined', username => {
-        showMessage(`${username} has joined`)
+        showMessage(`${username} has joined!`)
         addUser(username, 0)
       })
 
       socket.on('userDisconnected', username => {
-        showMessage(`${username} has left`)
+        showMessage(`${username} has left!`)
         removeUser(username)
       })
 
@@ -121,7 +121,7 @@ function App() {
       })
 
       socket.on('reset', data => {
-        showMessage('New round!')
+        showMessage('New voting round!')
         setUsers(data)
       })
 
