@@ -215,7 +215,7 @@ function App() {
       <div className="container mt-5">
         <h2>RWSG Scrum Planning Poker</h2>
         <div className="text-right">
-          Logged in as <strong>{connected}</strong> <button className="btn btn-sm btn-dark" onClick={handleLogout}>Logout</button>
+          Logged in as <strong>{connected.toLowerCase()}</strong> <button className="btn btn-sm btn-dark" onClick={handleLogout}>Logout</button>
         </div>
         <div className="row mt-4">
           <div className="col-md-12">
