@@ -129,6 +129,10 @@ io.on('connection', (socket) => {
       console.log('A user disconnected: ', socket.username);
     }
   });
+
+  socket.on("ping", (callback) => {
+    callback();
+  });
 });
 
 const port = process.env.PORT || 8686;

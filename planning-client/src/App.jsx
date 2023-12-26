@@ -60,6 +60,7 @@ function App() {
   const [avg, setAvg] = useState('N/A');
   const [currentVote, setCurrentVote] = useState(0);
   const [state, dispatch] = useReducer(reducer, initialState, undefined);
+  const [ping, setPing] = useState(0);
 
   const addUser = (username, value) => {
     dispatch({ type: 'ADD_USER', payload: { username, value } });
@@ -139,8 +140,18 @@ function App() {
         }
       })
 
+      const interval = setInterval(() => {
+        const start = Date.now();
+
+        socket.emit("ping", () => {
+          const duration = Date.now() - start;
+          setPing(duration);
+        });
+      }, 1000);
+
       return () => {
         socket.disconnect()
+        clearInterval(interval)
       }
     }
   }, [])
@@ -215,6 +226,7 @@ function App() {
     <>
       <div className="container mt-5">
         <h2>RWSG Scrum Planning Poker</h2>
+        <div className="text-left">Ping {ping}ms</div>
         <div className="d-flex flex-column text-right">
           {connected === 'master' && <React.Fragment>
             <div className="p-2">Scan this QR code to join</div>
