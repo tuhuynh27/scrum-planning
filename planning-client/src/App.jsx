@@ -1,5 +1,6 @@
 import React, { useEffect, useReducer, useState } from 'react'
 import io from 'socket.io-client'
+import QRCode from 'react-qr-code'
 import './App.css'
 
 export function showMessage(msg, timeout = 2000) {
@@ -214,9 +215,14 @@ function App() {
     <>
       <div className="container mt-5">
         <h2>RWSG Scrum Planning Poker</h2>
-        <div className="text-right">
-          Logged in as <strong>{connected && connected.toLowerCase()}</strong> <button className="btn btn-sm btn-dark" onClick={handleLogout}>Logout</button>
+        <div className="d-flex flex-column text-right">
+          {connected === 'master' && <React.Fragment>
+            <div className="p-2">Scan this QR code to join</div>
+            <div className="p-2"><QRCode value="https://plan.rwsg.lol" style={{ height: '150px', width: '150px' }} /></div>
+          </React.Fragment>}
+          <div className="p-2">Logged in as <strong>{connected && connected.toLowerCase()}</strong> <button className="btn btn-sm btn-dark" onClick={handleLogout}>Logout</button></div>
         </div>
+
         <div className="row mt-4">
           <div className="col-md-12">
             {connected === 'master' && (
