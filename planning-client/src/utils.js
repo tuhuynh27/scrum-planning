@@ -12,16 +12,16 @@ export function extractHashValue(url) {
 }
 
 export function appendRandomChars(inputStr) {
-  const randomChars = generateRandomChars(6);
+  const randomChars = generateRandomNumbers(4);
   return `${inputStr}-${randomChars}`;
 }
 
-function generateRandomChars(length) {
-  const chars = 'abcdefghijklmnopqrstuvwxyz';
-  let randomString = '';
+function generateRandomNumbers(length) {
+  const numericChars = '0123456789';
+  let randomNumberString = '';
   for (let i = 0; i < length; i++) {
-    const randomIndex = Math.floor(Math.random() * chars.length);
-    randomString += chars.charAt(randomIndex);
+    const randomIndex = Math.floor(Math.random() * numericChars.length);
+    randomNumberString += numericChars.charAt(randomIndex);
   }
-  return randomString;
+  return randomNumberString;
 }
