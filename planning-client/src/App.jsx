@@ -94,6 +94,7 @@ function App() {
       window.location.hash = newRoomId
       localStorage.setItem('username-' + newRoomId, 'master')
       window.location.reload()
+      return
     }
     const username = localStorage.getItem('username-' + roomId)
     if (!username) {
