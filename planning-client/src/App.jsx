@@ -240,12 +240,18 @@ function App() {
 
   if (!roomId || !username || !connected) {
     return (
-      <div className="jumbotron jumbotron-fluid">
-        <div className="container">
-          <h1 className="display-4">♠ Planning Poker v1</h1>
-          <p className="lead">Simple and fun story point estimations.</p>
+      <>
+        <div className="jumbotron jumbotron-fluid">
+          <div className="container">
+            <h1 className="display-4">♠ Planning Poker v1</h1>
+            <p className="lead">Simple and fun story point estimations.</p>
+          </div>
         </div>
-      </div>
+        <div className="container">
+          <p>Please refresh if you keep seeing this page.</p>
+          <p>Note: We do not support mobile in-app browser, please open in external browser.</p>
+        </div>
+      </>
     )
   }
 
