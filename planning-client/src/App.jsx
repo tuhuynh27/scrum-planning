@@ -91,7 +91,7 @@ function App() {
     const roomId = extractHashValue(window.location.hash)
     if (!roomId) {
       const roomName = prompt('Please enter the room name to create room:')
-      const newRoomId = appendRandomChars(roomName)
+      const newRoomId = appendRandomChars(roomName.toLowerCase())
       window.location.hash = newRoomId
       localStorage.setItem('username-' + newRoomId, 'master')
       window.location.reload()
@@ -100,7 +100,7 @@ function App() {
     if (!username) {
       const newUsername = prompt('Please enter your username:')
       if (newUsername) {
-        localStorage.setItem('username-' + roomId, newUsername)
+        localStorage.setItem('username-' + roomId, newUsername.toLowerCase())
       }
       window.location.reload()
     } else {
@@ -236,7 +236,7 @@ function App() {
             <div className="p-2">Scan this QR code to join</div>
             <div className="p-2"><QRCode value={`https://plan.rwsg.lol/#${roomId}`} style={{height: '150px', width: '150px'}}/></div>
           </React.Fragment>}
-          <div className="p-2">Logged in as <strong>{connected && connected.toLowerCase()}</strong>
+          <div className="p-2">Logged in as <strong>{connected}</strong>
             <button className="btn btn-sm btn-dark ml-2" onClick={handleLogout}>Logout</button>
           </div>
         </div>
@@ -311,7 +311,7 @@ const UserCard = ({username, voteStatus, gameState}) => {
     <div className="col-md-3 mb-3">
       <div className="card">
         <div className="card-body">
-          <h5 className="card-title"><strong>{username.toLowerCase()}</strong></h5>
+          <h5 className="card-title"><strong>{username}</strong></h5>
           <p className="card-text">
             {voteStatus > 0 ? 'Done!' : 'Hmm...'}
           </p>
