@@ -270,7 +270,7 @@ function App() {
                                                style={{height: '150px', width: '150px'}}/></div>
                 </React.Fragment>}
                 <div className="p-2">Logged in as <strong>{connected}</strong>
-                  <button className="btn btn-sm btn-dark ml-2" onClick={handleLogout}>Logout</button>
+                  <button className="btn btn-sm btn-dark ml-2" onClick={handleLogout}>Change name</button>
                 </div>
               </div>
             </div>
