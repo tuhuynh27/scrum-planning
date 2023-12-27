@@ -90,8 +90,9 @@ function App() {
     const roomId = extractHashValue(window.location.hash)
     if (!roomId) {
       const roomName = prompt('Please enter the room name to create room:')
-      window.location.hash = appendRandomChars(roomName)
-      localStorage.setItem('username-' + roomName, 'master')
+      const newRoomId = appendRandomChars(roomName)
+      window.location.hash = newRoomId
+      localStorage.setItem('username-' + newRoomId, 'master')
       window.location.reload()
     }
     const username = localStorage.getItem('username-' + roomId)
