@@ -7,7 +7,7 @@ import './App.css'
 
 const BASE_URL = 'https://plan-api.rwsg.lol'
 
-const roomId = extractHashValue(window.location.hash) || 'null'
+const roomId = extractHashValue(window.location.hash)
 
 // Define the initial state
 const initialState = {
@@ -225,6 +225,10 @@ function App() {
   const handleLogout = () => {
     localStorage.removeItem('username-' + roomId)
     window.location.reload()
+  }
+
+  if (!roomId || !connected) {
+    return null
   }
 
   return (
