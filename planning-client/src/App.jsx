@@ -56,6 +56,7 @@ function App() {
 
   const [connected, setConnected] = useState(null)
   const [currentTicket, setCurrentTicket] = useState('')
+  const [timerId, setTimerId] = useState(null)
   const [gameState, setGameState] = useState('voting')
   const [avg, setAvg] = useState('N/A')
   const [currentVote, setCurrentVote] = useState(0)
@@ -141,7 +142,9 @@ function App() {
 
     socket.on('gameContext', ({ticket, state}) => {
       setGameState(state)
-      setCurrentTicket(ticket)
+      if (connected !== 'master') {
+        setCurrentTicket(ticket)
+      }
     })
 
     socket.on('signal', ({state, data}) => {
@@ -186,8 +189,17 @@ function App() {
   }
 
   const handleTicketChange = (event) => {
-    setCurrentTicket(event.target.value)
-    sendTicketToServer(event.target.value)
+    const {value} = event.target
+    setCurrentTicket(value)
+
+    if (timerId) {
+      clearTimeout(timerId)
+    }
+    const newTimerId = setTimeout(() => {
+      sendTicketToServer(value)
+    }, 500)
+
+    setTimerId(newTimerId)
   }
 
   const handleEnd = () => {
@@ -230,7 +242,7 @@ function App() {
     return (
       <div className="jumbotron jumbotron-fluid">
         <div className="container">
-          <h1 className="display-4">♠ Scrum Planning Poker v1</h1>
+          <h1 className="display-4">♠ Planning Poker v1</h1>
           <p className="lead">Simple and fun story point estimations.</p>
         </div>
       </div>
@@ -244,8 +256,10 @@ function App() {
         <div className="container-fluid">
           <div className="row">
             <div className="col-md-6">
-              <h2>♠ Scrum Planning Poker v1</h2>
-              <p>Room <strong>{roomId}</strong>, ping {ping}ms <button className="btn btn-secondary btn-sm" onClick={handleChangeRoom}>Change room</button></p>
+              <h2>♠ Planning Poker v1</h2>
+              <p>Room <strong>{roomId}</strong>, ping {ping}ms <button className="btn btn-secondary btn-sm"
+                                                                       onClick={handleChangeRoom}>Change room</button>
+              </p>
             </div>
 
             <div className="col-md-6">
