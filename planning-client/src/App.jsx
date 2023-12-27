@@ -225,6 +225,11 @@ function App() {
     window.location.reload()
   }
 
+  const handleChangeRoom = () => {
+    window.location.hash = ''
+    window.location.reload()
+  }
+
   if (!roomId || !username || !connected) {
     return null
   }
@@ -232,15 +237,26 @@ function App() {
   return (
     <>
       <div className="container mt-5">
-        <h2>Scrum Planning Poker</h2>
-        <div className="text-left">Room <strong>{roomId}</strong>, ping {ping}ms</div>
-        <div className="d-flex flex-column text-right">
-          {connected === 'master' && <React.Fragment>
-            <div className="p-2">Scan this QR code to join</div>
-            <div className="p-2"><QRCode value={`https://plan.rwsg.lol/#${roomId}`} style={{height: '150px', width: '150px'}}/></div>
-          </React.Fragment>}
-          <div className="p-2">Logged in as <strong>{connected}</strong>
-            <button className="btn btn-sm btn-dark ml-2" onClick={handleLogout}>Logout</button>
+
+        <div className="container-fluid">
+          <div className="row">
+            <div className="col-md-6">
+              <h2>♠ Scrum Planning Poker v1</h2>
+              <p>Room <strong>{roomId}</strong>, ping {ping}ms <button className="btn btn-secondary btn-sm" onClick={handleChangeRoom}>Change room</button></p>
+            </div>
+
+            <div className="col-md-6">
+              <div className="d-flex flex-column text-right">
+                {connected === 'master' && <React.Fragment>
+                  <div className="p-2">Scan this QR code to join</div>
+                  <div className="p-2"><QRCode value={`https://plan.rwsg.lol/#${roomId}`}
+                                               style={{height: '150px', width: '150px'}}/></div>
+                </React.Fragment>}
+                <div className="p-2">Logged in as <strong>{connected}</strong>
+                  <button className="btn btn-sm btn-dark ml-2" onClick={handleLogout}>Logout</button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -276,7 +292,7 @@ function App() {
           <div className="col-md-12 text-center">
             {connected === 'master' && gameState === 'voting' && (
               <div className="form-group">
-                <button type="button" onClick={handleEnd} className="btn btn-primary">Show cards</button>
+                <button type="button" onClick={handleEnd} className="btn btn-secondary">Show cards</button>
               </div>
             )}
             {connected === 'master' && gameState !== 'voting' && (
