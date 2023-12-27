@@ -7,9 +7,6 @@ import './App.css'
 
 const BASE_URL = 'https://plan-api.rwsg.lol'
 
-const roomId = extractHashValue(window.location.hash)
-const username = localStorage.getItem('username-' + roomId)
-
 // Define the initial state
 const initialState = {
   users: {},
@@ -52,6 +49,9 @@ const reducer = (state, action) => {
 }
 
 function App() {
+  const [roomId, setRoomId] = useState(extractHashValue(window.location.hash))
+  const [username, setUsername] = useState(localStorage.getItem('username-' + roomId))
+
   const [connected, setConnected] = useState(null)
   const [currentTicket, setCurrentTicket] = useState('')
   const [gameState, setGameState] = useState('voting')
@@ -85,82 +85,85 @@ function App() {
       setGameState(data.state)
       setCurrentTicket(data.ticket)
     })
-  }, [connected])
+  }, [connected, roomId])
 
   useEffect(() => {
-    const roomId = extractHashValue(window.location.hash)
     if (!roomId) {
       const roomName = prompt('Please enter the room name to create room:')
-      const newRoomId = appendRandomChars(roomName.toLowerCase())
-      window.location.hash = newRoomId
-      localStorage.setItem('username-' + newRoomId, 'master')
-      window.location.reload()
+      if (roomName) {
+        const newRoomId = appendRandomChars(roomName.toLowerCase())
+        window.location.hash = newRoomId
+        localStorage.setItem('username-' + newRoomId, 'master')
+        setRoomId(newRoomId)
+        setUsername('master')
+      }
       return
     }
     if (!username) {
       const newUsername = prompt('Please enter your username:')
       if (newUsername) {
-        localStorage.setItem('username-' + roomId, newUsername.toLowerCase())
+        localStorage.setItem('username-' + roomId, newUsername && newUsername.toLowerCase())
+        setUsername(newUsername)
       }
-      window.location.reload()
-    } else {
-      const socket = io(BASE_URL, {
-        query: {username, roomId},
-      })
-
-      socket.on('connect', () => {
-        showMessage(`Logged in as ${username}`)
-        setConnected(username)
-      })
-
-      socket.on('userJoined', username => {
-        showMessage(`${username} has joined!`)
-        addUser(username, 0)
-      })
-
-      socket.on('userDisconnected', username => {
-        showMessage(`${username} has left!`)
-        removeUser(username)
-      })
-
-      socket.on('newVote', ({username, vote}) => {
-        showMessage(`${username} voted!`)
-        setUser(username, vote)
-      })
-
-      socket.on('reset', data => {
-        showMessage('New voting round!')
-        setUsers(data)
-      })
-
-      socket.on('gameContext', ({ticket, state}) => {
-        setGameState(state)
-        setCurrentTicket(ticket)
-      })
-
-      socket.on('signal', ({state, data}) => {
-        if (state === 'start') {
-          setCurrentVote(0)
-        } else {
-          setAvg(data)
-        }
-      })
-
-      const interval = setInterval(() => {
-        const start = Date.now()
-
-        socket.emit('ping', () => {
-          const duration = Date.now() - start
-          setPing(duration)
-        })
-      }, 1000)
-
-      return () => {
-        socket.disconnect()
-        clearInterval(interval)
-      }
+      return
     }
-  }, [])
+
+    const socket = io(BASE_URL, {
+      query: {username, roomId},
+    })
+
+    socket.on('connect', () => {
+      showMessage(`Logged in as ${username}`)
+      setConnected(username)
+    })
+
+    socket.on('userJoined', username => {
+      showMessage(`${username} has joined!`)
+      addUser(username, 0)
+    })
+
+    socket.on('userDisconnected', username => {
+      showMessage(`${username} has left!`)
+      removeUser(username)
+    })
+
+    socket.on('newVote', ({username, vote}) => {
+      showMessage(`${username} voted!`)
+      setUser(username, vote)
+    })
+
+    socket.on('reset', data => {
+      showMessage('New voting round!')
+      setUsers(data)
+    })
+
+    socket.on('gameContext', ({ticket, state}) => {
+      setGameState(state)
+      setCurrentTicket(ticket)
+    })
+
+    socket.on('signal', ({state, data}) => {
+      if (state === 'start') {
+        setCurrentVote(0)
+      } else {
+        setAvg(data)
+      }
+    })
+
+    const interval = setInterval(() => {
+      const start = Date.now()
+
+      socket.emit('ping', () => {
+        const duration = Date.now() - start
+        setPing(duration)
+      })
+    }, 1000)
+
+    return () => {
+      socket.disconnect()
+      clearInterval(interval)
+    }
+  }, [roomId, username])
 
   const submitVote = (vote) => {
     fetch(BASE_URL + '/vote', {
@@ -222,14 +225,14 @@ function App() {
     window.location.reload()
   }
 
-  if (!roomId || !connected) {
+  if (!roomId || !username || !connected) {
     return null
   }
 
   return (
     <>
       <div className="container mt-5">
-        <h2>RWSG Scrum Planning Poker</h2>
+        <h2>Scrum Planning Poker</h2>
         <div className="text-left">Room <strong>{roomId}</strong>, ping {ping}ms</div>
         <div className="d-flex flex-column text-right">
           {connected === 'master' && <React.Fragment>
