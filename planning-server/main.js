@@ -9,10 +9,10 @@ const server = http.createServer(app);
 const io = socketIO(server, {
   cors: {
     origin: '*',
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allowing all HTTP methods
-    allowedHeaders: ['*'], // Allowing all headers
-    credentials: true // Allow credentials (if used)
-  }
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['*'],
+    credentials: true,
+  },
 });
 
 const calcAvg = (users) => {
@@ -26,111 +26,149 @@ const calcAvg = (users) => {
   });
   const average = sum / count;
   return average.toFixed(2);
-}
-
-const users = {
 };
-const gameContext = {
-  state: 'voting', // 'voting', 'ending',
-  ticket: ''
-}
+
+const rooms = {};
 
 app.use(cors());
 
 app.get('/users', (req, res) => {
-  res.json(users);
+  const roomId = req.query.roomId;
+  if (!roomId || !rooms[roomId]) {
+    return res.status(400).json({ error: 'Invalid room ID' });
+  }
+
+  res.json(rooms[roomId].users);
 });
 
 app.get('/context', (req, res) => {
-  res.json(gameContext);
-})
-
-app.post('/vote', express.json(), (req, res) => {
-  const { username, vote } = req.body;
-  if (users[username] === null || users[username] === undefined || isNaN(vote) || vote < 1 || vote > 5) {
-    return res.status(400).json({ error: 'Invalid username or vote value' });
+  const roomId = req.query.roomId;
+  if (!roomId || !rooms[roomId]) {
+    return res.status(400).json({ error: 'Invalid room ID' });
   }
 
-  users[username] = vote;
-  io.emit('newVote', { username, vote }); // Broadcast new vote to all users
+  res.json(rooms[roomId].gameContext);
+});
+
+app.post('/vote', express.json(), (req, res) => {
+  const { username, vote, roomId } = req.body;
+  const room = rooms[roomId];
+
+  if (!room || !room.users[username] === null || isNaN(vote) || vote < 1 || vote > 5) {
+    console.error('Error: Invalid username, room ID, or vote value');
+    return res.status(400).json({ error: 'Invalid username, room ID, or vote value' });
+  }
+
+  room.users[username] = vote;
+  io.to(roomId).emit('newVote', { username, vote });
+  console.log(`User action: Vote received and saved successfully for ${username} in room ${roomId}`);
   return res.status(200).json({ message: 'Vote received and saved successfully' });
 });
 
 app.post('/ticket', express.json(), (req, res) => {
-  const { username, ticket } = req.body;
-  if (username !== 'master') {
-    return res.status(403).json({ error: 'Only "master" can change the ticket' });
+  const { username, ticket, roomId } = req.body;
+  const room = rooms[roomId];
+
+  if (!room || username !== 'master') {
+    return res.status(403).json({ error: 'Invalid room ID or unauthorized access' });
   }
 
-  gameContext.ticket = ticket;
-  io.emit('gameContext', gameContext);
+  room.gameContext.ticket = ticket;
+  io.to(roomId).emit('gameContext', room.gameContext);
 
+  console.log(`User action: Ticket updated by ${username} in room ${roomId}`);
   return res.status(200).json({ message: 'Ticket updated' });
 });
 
 app.post('/start', express.json(), (req, res) => {
-  const { username } = req.body;
-  if (username !== 'master') {
-    return res.status(403).json({ error: 'Only "master" can start a round' });
+  const { username, roomId } = req.body;
+  const room = rooms[roomId];
+
+  if (!room || username !== 'master') {
+    return res.status(403).json({ error: 'Invalid room ID or unauthorized access' });
   }
 
-  const roundInProgress = gameContext.state === 'voting'
+  const roundInProgress = room.gameContext.state === 'voting';
+
   if (!roundInProgress) {
-    gameContext.state = 'voting'
-    for (let key in users) {
-      users[key] = 0;
+    room.gameContext.state = 'voting';
+
+    // Reset user votes within the specific room
+    for (let key in room.users) {
+      room.users[key] = 0;
     }
-    io.emit('gameContext', gameContext);
-    io.emit('signal', { state: 'start' });
-    io.emit('reset', users);
+
+    io.to(roomId).emit('gameContext', room.gameContext);
+    io.to(roomId).emit('signal', { state: 'start' });
+    io.to(roomId).emit('reset', room.users);
+
+    console.log(`User action: New round started by ${username} in room ${roomId}`);
     return res.status(200).json({ message: 'New round started' });
   } else {
+    console.error('Error: Round is already in progress');
     return res.status(400).json({ error: 'Round is already in progress' });
   }
 });
 
 app.post('/end', express.json(), (req, res) => {
-  const { username } = req.body;
-  if (username !== 'master') {
-    return res.status(403).json({ error: 'Only "master" can end a round' });
+  const { username, roomId } = req.body;
+  const room = rooms[roomId];
+
+  if (!room || username !== 'master') {
+    return res.status(403).json({ error: 'Invalid room ID or unauthorized access' });
   }
 
-  const roundInProgress = gameContext.state === 'voting'
+  const roundInProgress = room.gameContext.state === 'voting';
+
   if (roundInProgress) {
-    gameContext.state = 'ending'
-    io.emit('gameContext', gameContext);
-    io.emit('signal', { state: 'end', data: calcAvg(users) });
+    room.gameContext.state = 'ending';
+    io.to(roomId).emit('gameContext', room.gameContext);
+    io.to(roomId).emit('signal', { state: 'end', data: calcAvg(room.users) });
+
+    console.log(`User action: Round ended by ${username} in room ${roomId}`);
     return res.status(200).json({ message: 'Round ended' });
   } else {
+    console.error('Error: No round is currently in progress');
     return res.status(400).json({ error: 'No round is currently in progress' });
   }
 });
 
 io.use((socket, next) => {
   const username = socket.handshake.query.username;
-  if (username) {
+  const roomId = socket.handshake.query.roomId;
+
+  if (username && roomId) {
+    if (!rooms[roomId]) {
+      rooms[roomId] = { users: {}, gameContext: { state: 'voting', ticket: '' } };
+    }
+
     socket.username = username;
-    users[username] = 0;
-    io.emit('userJoined', username);
-    console.log('A user connected: ', socket.username);
+    socket.roomId = roomId;
+
+    rooms[roomId].users[username] = 0;
+
+    io.to(roomId).emit('userJoined', username);
+    console.log(`A user connected to room ${roomId}: `, socket.username);
     next();
   } else {
-    next(new Error('Authentication error: No token provided'));
+    console.error('Error: Authentication error - No username or room ID provided');
+    next(new Error('Authentication error: No username or room ID provided'));
   }
 });
 
-// Listen for client connections
 io.on('connection', (socket) => {
-  // Handle disconnection of clients
+  socket.join(socket.roomId);
+
   socket.on('disconnect', () => {
-    if (socket.username && users[socket.username] !== undefined) {
-      delete users[socket.username];
-      io.emit('userDisconnected', socket.username);
-      console.log('A user disconnected: ', socket.username);
+    const roomId = socket.roomId;
+    if (socket.username && rooms[roomId] && rooms[roomId].users[socket.username] !== undefined) {
+      delete rooms[roomId].users[socket.username];
+      io.to(roomId).emit('userDisconnected', socket.username);
+      console.log(`A user disconnected from room ${roomId}: `, socket.username);
     }
   });
 
-  socket.on("ping", (callback) => {
+  socket.on('ping', (callback) => {
     callback();
   });
 });
