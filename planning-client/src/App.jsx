@@ -91,10 +91,10 @@ function App() {
     if (!roomId) {
       const roomName = prompt('Please enter the room name to create room:')
       window.location.hash = appendRandomChars(roomName)
-      localStorage.setItem('username', 'master')
+      localStorage.setItem('username-' + roomName, 'master')
       window.location.reload()
     }
-    const username = localStorage.getItem('username')
+    const username = localStorage.getItem('username-' + roomId)
     if (!username) {
       const username = prompt('Please enter your username:')
       if (username) {
