@@ -48,6 +48,8 @@ const reducer = (state, action) => {
   }
 }
 
+let socket = null
+
 function App() {
   const [roomId, setRoomId] = useState(extractHashValue(window.location.hash))
   const [username, setUsername] = useState(localStorage.getItem('username-' + roomId))
@@ -108,7 +110,7 @@ function App() {
       return
     }
 
-    const socket = io(BASE_URL, {
+    socket = io(BASE_URL, {
       query: {username, roomId},
     })
 
@@ -178,15 +180,9 @@ function App() {
   }
 
   const sendTicketToServer = (data) => {
-    fetch(BASE_URL + '/ticket', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({roomId, username, ticket: data}),
-    }).then(r => r.json()).then(data => {
-      console.log(data)
-    })
+    if (socket) {
+      socket.emit('ticket', data)
+    }
   }
 
   const handleTicketChange = (event) => {
