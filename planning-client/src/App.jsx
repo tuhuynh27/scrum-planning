@@ -8,6 +8,7 @@ import './App.css'
 const BASE_URL = 'https://plan-api.rwsg.lol'
 
 const roomId = extractHashValue(window.location.hash)
+const username = localStorage.getItem('username-' + roomId)
 
 // Define the initial state
 const initialState = {
@@ -96,11 +97,10 @@ function App() {
       window.location.reload()
       return
     }
-    const username = localStorage.getItem('username-' + roomId)
     if (!username) {
-      const username = prompt('Please enter your username:')
-      if (username) {
-        localStorage.setItem('username-' + roomId, username)
+      const newUsername = prompt('Please enter your username:')
+      if (newUsername) {
+        localStorage.setItem('username-' + roomId, newUsername)
       }
       window.location.reload()
     } else {
@@ -163,8 +163,6 @@ function App() {
   }, [])
 
   const submitVote = (vote) => {
-    const username = localStorage.getItem('username-' + roomId)
-    console.log(JSON.stringify({username, vote}))
     fetch(BASE_URL + '/vote', {
       method: 'POST',
       headers: {
@@ -177,7 +175,6 @@ function App() {
   }
 
   const sendTicketToServer = (data) => {
-    const username = localStorage.getItem('username-' + roomId)
     fetch(BASE_URL + '/ticket', {
       method: 'POST',
       headers: {
@@ -195,7 +192,6 @@ function App() {
   }
 
   const handleEnd = () => {
-    const username = localStorage.getItem('username-' + roomId)
     fetch(BASE_URL + '/end', {
       method: 'POST',
       headers: {
@@ -208,7 +204,6 @@ function App() {
   }
 
   const handleStart = () => {
-    const username = localStorage.getItem('username-' + roomId)
     fetch(BASE_URL + '/start', {
       method: 'POST',
       headers: {
