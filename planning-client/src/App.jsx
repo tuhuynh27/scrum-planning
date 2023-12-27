@@ -163,7 +163,7 @@ function App() {
   }, [])
 
   const submitVote = (vote) => {
-    const username = localStorage.getItem('username')
+    const username = localStorage.getItem('username-' + roomId)
     console.log(JSON.stringify({username, vote}))
     fetch(BASE_URL + '/vote', {
       method: 'POST',
@@ -177,7 +177,7 @@ function App() {
   }
 
   const sendTicketToServer = (data) => {
-    const username = localStorage.getItem('username')
+    const username = localStorage.getItem('username-' + roomId)
     fetch(BASE_URL + '/ticket', {
       method: 'POST',
       headers: {
@@ -195,7 +195,7 @@ function App() {
   }
 
   const handleEnd = () => {
-    const username = localStorage.getItem('username')
+    const username = localStorage.getItem('username-' + roomId)
     fetch(BASE_URL + '/end', {
       method: 'POST',
       headers: {
@@ -208,7 +208,7 @@ function App() {
   }
 
   const handleStart = () => {
-    const username = localStorage.getItem('username')
+    const username = localStorage.getItem('username-' + roomId)
     fetch(BASE_URL + '/start', {
       method: 'POST',
       headers: {
