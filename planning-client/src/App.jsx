@@ -89,7 +89,7 @@ function App() {
 
   useEffect(() => {
     if (!roomId) {
-      const roomName = prompt('Please enter the room name to create room:')
+      const roomName = prompt('Please enter the room name to create a room:')
       if (roomName) {
         const newRoomId = appendRandomChars(roomName.toLowerCase())
         window.location.hash = newRoomId
@@ -231,7 +231,14 @@ function App() {
   }
 
   if (!roomId || !username || !connected) {
-    return null
+    return (
+      <div className="jumbotron jumbotron-fluid">
+        <div className="container">
+          <h1 className="display-4">♠ Scrum Planning Poker v1</h1>
+          <p className="lead">Simple and fun story point estimations.</p>
+        </div>
+      </div>
+    )
   }
 
   return (
