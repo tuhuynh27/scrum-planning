@@ -263,6 +263,7 @@ function App() {
           <div className="row">
             <div className="col-md-6">
               <h2>♠ Planning Poker v1</h2>
+              <p>"Make estimates with your teammates with this simple app"</p>
               <p>Room <strong>{roomId}</strong>, ping {ping}ms <button className="btn btn-secondary btn-sm"
                                                                        onClick={handleChangeRoom}>Change room</button>
               </p>
