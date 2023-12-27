@@ -229,7 +229,7 @@ function App() {
     <>
       <div className="container mt-5">
         <h2>RWSG Scrum Planning Poker</h2>
-        <div className="text-left">Ping {ping}ms</div>
+        <div className="text-left">Room <strong>{roomId}</strong>, ping {ping}ms</div>
         <div className="d-flex flex-column text-right">
           {connected === 'master' && <React.Fragment>
             <div className="p-2">Scan this QR code to join</div>
