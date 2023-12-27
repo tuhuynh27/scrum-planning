@@ -336,7 +336,7 @@ const UserCard = ({username, voteStatus, gameState}) => {
           </p>
           <div
             className={`voting-card ${gameState === 'voting' && voteStatus > 0 ? 'voted' : null} ${gameState !== 'voting' && voteStatus > 0 ? 'revealed' : null}`}>
-            {gameState !== 'voting' && voteStatus > 0 && voteStatus}
+            {gameState !== 'voting' && voteStatus > 0 && voteStatus || '♠'}
           </div>
         </div>
       </div>
