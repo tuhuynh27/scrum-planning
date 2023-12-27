@@ -99,7 +99,7 @@ function App() {
     if (!username) {
       const username = prompt('Please enter your username:')
       if (username) {
-        localStorage.setItem('username', username)
+        localStorage.setItem('username-' + roomId, username)
       }
       window.location.reload()
     } else {
@@ -222,7 +222,7 @@ function App() {
   }
 
   const handleLogout = () => {
-    localStorage.removeItem('username')
+    localStorage.removeItem('username-' + roomId)
     window.location.reload()
   }
 
