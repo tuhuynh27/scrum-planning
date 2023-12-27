@@ -92,7 +92,7 @@ function App() {
 
   useEffect(() => {
     if (!roomId) {
-      const roomName = prompt('Please enter the room name to create a room:')
+      const roomName = prompt('Please enter the room name to create a poker room:')
       if (roomName) {
         const newRoomId = appendRandomChars(roomName.toLowerCase())
         window.location.hash = newRoomId
@@ -103,7 +103,7 @@ function App() {
       return
     }
     if (!username) {
-      const newUsername = prompt('Please enter your username:')
+      const newUsername = prompt('Please enter your name:')
       if (newUsername) {
         localStorage.setItem('username-' + roomId, newUsername && newUsername.toLowerCase())
         setUsername(newUsername)
