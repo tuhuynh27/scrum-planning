@@ -5,7 +5,7 @@ import { showMessage } from './snatch'
 import { appendRandomChars, extractHashValue } from './utils'
 import './App.css'
 
-const BASE_URL = 'https://plan-api.rwsg.lol'
+const BASE_URL = 'https://plan-api.rws.lol'
 
 // Define the initial state
 const initialState = {
